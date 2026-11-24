@@ -3,15 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Guardiões Verdes - Jogo de Lógica com Ranking</title>
+<title>Lógica e Sustentabilidade</title>
 <style>
   *{box-sizing:border-box}
   body{font-family:Arial,sans-serif;text-align:center;background:#e8f5e9;padding:15px;margin:0}
   h1{font-size:28px;margin-bottom:5px}
-  .card{background:white;padding:22px;border-radius:18px;max-width:620px;margin:15px auto;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+  .card{background:white;padding:22px;border-radius:18px;max-width:640px;margin:15px auto;box-shadow:0 4px 12px rgba(0,0,0,.12)}
   .badge{display:inline-block;background:#2e7d32;color:white;padding:5px 12px;border-radius:20px;font-size:13px;margin-bottom:10px}
-  .pergunta{font-size:20px;line-height:1.4;min-height:70px}
+  .pergunta{font-size:19px;line-height:1.5;min-height:70px;text-align:left}
   .explica{background:#fff3cd;padding:12px;border-radius:10px;text-align:left;font-size:15px;margin-top:10px}
+  .conceito{background:#e8f5e9;padding:14px;border-radius:12px;text-align:left;font-size:15px;line-height:1.5;margin:10px 0}
   button{font-size:17px;padding:12px 18px;margin:6px;border:none;border-radius:12px;cursor:pointer}
   .v{background:#4caf50;color:white}
   .f{background:#f44336;color:white}
@@ -27,17 +28,15 @@
   td,th{border:1px solid #ccc;padding:8px 10px}
   .certo{color:#2e7d32}.errado{color:#c62828}
   input[type=text]{font-size:18px;padding:12px;width:100%;text-align:center;border-radius:10px;border:2px solid #2e7d32;margin:10px 0}
-  input[type=number]{font-size:18px;padding:8px;width:100px;text-align:center;border-radius:8px;border:2px solid #ccc}
+  input[type=number]{font-size:18px;padding:8px;width:110px;text-align:center;border-radius:8px;border:2px solid #ccc}
   .ranking{text-align:left}
-  .pos1{background:#fff8e1}.pos2{background:#f5f5f5}.pos3{background:#efebe9}
-  .medal{font-size:20px}
   .topo{display:flex;justify-content:space-between;align-items:center;background:#2e7d32;color:white;padding:10px 15px;border-radius:12px;margin-bottom:10px}
   .small{font-size:13px;color:#666}
+  .perdeu{color:#c62828;font-size:13px}
 </style>
 </head>
 <body>
-<h1>🌳 Guardiões Verdes</h1>
-<p>Salve a floresta com lógica!</p>
+<h1>🌳 Lógica e Sustentabilidade</h1>
 <div class="card" id="tela"></div>
 
 <script>
@@ -53,24 +52,23 @@ function salvarRanking(){
   ranking = ranking.slice(0,10);
   localStorage.setItem('gv_ranking', JSON.stringify(ranking));
 }
-
+function mostrarRankingHTML(){
+  const medals=["🥇","🥈","🥉"];
+  return ranking.map((r,i)=>`
+    <div style="display:flex;justify-content:space-between;padding:8px;border-radius:8px;${i<3?'background:#fff8e1':''}">
+      <span><span>${medals[i]||(i+1)+'º'}</span> <b>${r.nome}</b> <span class="small">${r.data}</span></span>
+      <b>${r.pontos} pts</b>
+    </div>`).join('');
+}
 function telaNome(){
   tela.innerHTML=`
     <h2>👋 Olá, Guardião!</h2>
     <p>Qual é o seu nome?</p>
     <input type="text" id="nomeInput" placeholder="Ex: Maria, João, Ana..." value="${jogador}" maxlength="20">
     <br><button class="next" onclick="comecar()">Começar a jogar ▶️</button>
-    <p class="small">Seu nome fica salvo para o ranking.</p>
+    <p class="small">Seu nome fica salvo para o ranking. Errou? Perde 5 pontos. Acertou? Ganha pontos!</p>
     ${ranking.length?`<h3>🏆 Ranking</h3><div class="ranking">${mostrarRankingHTML()}</div>`:''}
   `;
-}
-function mostrarRankingHTML(){
-  const medals=["🥇","🥈","🥉"];
-  return ranking.map((r,i)=>`
-    <div style="display:flex;justify-content:space-between;padding:8px;border-radius:8px;${i<3?'background:#fff8e1':''}">
-      <span><span class="medal">${medals[i]||(i+1)+'º'}</span> <b>${r.nome}</b> <span class="small">${r.data}</span></span>
-      <b>${r.pontos} pts</b>
-    </div>`).join('');
 }
 function comecar(){
   const v=document.getElementById('nomeInput').value.trim();
@@ -82,13 +80,12 @@ function menu(){
   tela.innerHTML=`
     <div class="topo"><span>👤 <b>${jogador}</b></span><span>⭐ ${pontos} pts</span></div>
     <h2>Escolha seu nível 🗺️</h2>
-    <button class="menu" onclick="nivel1()">🌱 Nível 1 - Verdadeiro ou Falso</button>
-    <button class="menu" onclick="nivel2()">🧠 Nível 2 - Argumento Válido ou Falácia?</button>
-    <button class="menu" onclick="nivel3()">📊 Nível 3 - Tabela-Verdade</button>
-    <button class="menu" onclick="nivel4()">🌲 Nível 4 - Fragmentação e Efeito de Borda</button>
+    <button class="menu" onclick="intro1()">🌱 Nível 1 - Verdadeiro ou Falso</button>
+    <button class="menu" onclick="intro2()">🧠 Nível 2 - Válido ou Inválido?</button>
+    <button class="menu" onclick="intro3()">📊 Nível 3 - Tabela-Verdade na Floresta</button>
+    <button class="menu" onclick="intro4()">🌲 Nível 4 - Fragmentação e Efeito de Borda</button>
     <button class="menu gold" style="color:#333" onclick="verRanking()">🏆 Ver Ranking Completo</button>
     <button class="menu" style="background:#666" onclick="trocarJogador()">🔄 Trocar Jogador</button>
-    <p class="small">Válido = forma correta. Sólido = válido + premissas verdadeiras.</p>
   `;
 }
 function trocarJogador(){ jogador=""; localStorage.removeItem('gv_nome'); pontos=0; telaNome(); }
@@ -100,8 +97,29 @@ function verRanking(){
     <button style="background:#f44336;color:white" onclick="if(confirm('Apagar todo o ranking?')){ranking=[];localStorage.removeItem('gv_ranking');verRanking()}">Apagar Ranking</button>
   `;
 }
+function perderPontos(){
+  pontos = Math.max(0, pontos - 5);
+}
 
-// ===== NÍVEL 1 =====
+// ================= NÍVEL 1 =================
+function intro1(){
+  tela.innerHTML=`
+    <span class="badge">NÍVEL 1</span>
+    <h2>🌱 Antes de começar...</h2>
+    <div class="conceito">
+      <b>O que você vai fazer?</b> Ler uma afirmação sobre a floresta e dizer se ela é <b>Verdadeira (V)</b> ou <b>Falsa (F)</b>.<br><br>
+      <b>Conceitos que vão aparecer:</b><br>
+      • <b>Fotossíntese:</b> a árvore absorve gás carbônico e libera oxigênio.<br>
+      • <b>Desmatamento:</b> cortar a floresta. Destrói o habitat e o nicho ecológico dos animais.<br>
+      • <b>Reflorestamento:</b> plantar novas árvores onde a floresta foi destruída.<br>
+      • <b>Fragmentação:</b> dividir a floresta em pedaços. Mesmo sem desmatar tudo, já prejudica, porque cria borda e isola as populações.<br>
+      • <b>Queimada:</b> polui o ar, não limpa.
+    </div>
+    <p>✅ Acerto: <b>+10</b> &nbsp; | &nbsp; ❌ Erro: <b>-5</b></p>
+    <button class="next" onclick="nivel1()">Entendi, começar! ▶️</button>
+    <button onclick="menu()">Voltar</button>
+  `;
+}
 let n1=0;
 const perguntas1=[
   {t:"As árvores fazem fotossíntese e absorvem gás carbônico.", r:true, e:"Sim! E liberam oxigênio."},
@@ -114,66 +132,160 @@ function nivel1(){ n1=0; mostrar1(); }
 function mostrar1(){
   if(n1>=perguntas1.length){ tela.innerHTML=`<h2>🎉 Nível 1 completo!</h2><p>${jogador}, você tem ${pontos} pontos.</p><button class="next" onclick="menu()">Menu</button>`; return; }
   const p=perguntas1[n1];
-  tela.innerHTML=`<span class="badge">NÍVEL 1 • ${n1+1}/5 • ${jogador} • ${pontos} pts</span><div class="barra"><div class="progresso" style="width:${n1*20}%"></div></div><p class="pergunta">${p.t}</p><button class="v" onclick="resp1(true)">Verdadeiro</button><button class="f" onclick="resp1(false)">Falso</button><p id="feedback"></p><div id="btn"></div>`;
+  tela.innerHTML=`<span class="badge">NÍVEL 1 • ${n1+1}/5 • ${jogador} • ${pontos} pts</span><div class="barra"><div class="progresso" style="width:${n1*20}%"></div></div><p class="pergunta">${p.t}</p><button class="v" onclick="resp1(true)">Verdadeiro</button><button class="f" onclick="resp1(false)">Falso</button><p id="feedback"></p><div id="btn"></div><p class="perdeu">Erro = -5 pontos</p>`;
 }
 function resp1(resp){
-  const p=perguntas1[n1]; const ok=p.r===resp; if(ok) pontos+=10;
-  document.getElementById('feedback').innerHTML=ok?`<span class="certo">✅ Acertou! +10</span>`:`<span class="errado">❌ Errou!</span>`;
+  const p=perguntas1[n1]; const ok=p.r===resp; if(ok) pontos+=10; else perderPontos();
+  document.getElementById('feedback').innerHTML=ok?`<span class="certo">✅ Acertou! +10</span>`:`<span class="errado">❌ Errou! -5</span>`;
   document.getElementById('btn').innerHTML=`<div class="explica">${p.e}</div><button class="next" onclick="n1++;mostrar1()">Próxima →</button>`;
 }
 
-// ===== NÍVEL 2 =====
+// ================= NÍVEL 2 =================
+function intro2(){
+  tela.innerHTML=`
+    <span class="badge">NÍVEL 2</span>
+    <h2>🧠 Antes de começar...</h2>
+    <div class="conceito">
+      <b>O que é um argumento válido?</b><br>
+      É quando <b>SE as premissas fossem verdadeiras, a conclusão TERIA que ser verdadeira</b>. Não importa se na vida real a premissa é verdadeira ou não, importa a FORMA.<br><br>
+      <b>Exemplo válido:</b><br>
+      Se chover, então o chão molha. Choveu. Logo, o chão molhou.<br><br>
+      <b>Exemplo INVÁLIDO:</b><br>
+      Se chover, então o chão molha. O chão molhou. Logo, choveu.<br>
+      → Inválido! O chão pode ter molhado porque alguém jogou água com a mangueira.<br><br>
+      <b>Outro inválido:</b><br>
+      Se chover, então o chão molha. Não choveu. Logo, o chão não molhou.<br>
+      → Inválido! Pode ter molhado por outro motivo.<br><br>
+      <b>Você só vai classificar: VÁLIDO ou INVÁLIDO.</b> Sem nome de falácia!
+    </div>
+    <p>✅ Acerto: <b>+20</b> &nbsp; | &nbsp; ❌ Erro: <b>-5</b></p>
+    <button class="next" onclick="nivel2()">Entendi, começar! ▶️</button>
+    <button onclick="menu()">Voltar</button>
+  `;
+}
 let n2=0;
 const perguntas2=[
-  {t:"<b>Se reflorestarmos, então a biodiversidade aumenta.</b><br>Reflorestamos.<br>Logo, a biodiversidade aumenta.", r:"Modus Ponens", e:"VÁLIDO! p → q, p ∴ q."},
-  {t:"<b>Se reflorestarmos, então as mudas crescem.</b><br>As mudas cresceram.<br>Logo, reflorestamos.", r:"Afirmando o Consequente", e:"FALÁCIA! q ∴ p é inválido."},
-  {t:"<b>Se reflorestarmos, então as mudas crescem.</b><br>Não reflorestamos.<br>Logo, as mudas não cresceram.", r:"Negando o Antecedente", e:"FALÁCIA! ¬p ∴ ¬q é inválido."},
-  {t:"<b>Se reflorestarmos, então as mudas crescem.</b><br>As mudas NÃO cresceram.<br>Logo, não reflorestamos.", r:"Modus Tollens", e:"VÁLIDO! p → q, ¬q ∴ ¬p."},
-  {t:"<b>Se desmatarmos, então os animais perdem o habitat.</b><br>Os animais perderam o habitat.<br>Logo, desmatamos.", r:"Afirmando o Consequente", e:"FALÁCIA! Pode ter sido incêndio ou estrada."},
-  {t:"<b>Se desmatarmos, então o ar fica mais limpo.</b><br>Desmatamos.<br>Logo, o ar ficou mais limpo.", r:"Válido mas NÃO sólido", e:"Forma válida, mas premissa FALSA! Válido ≠ verdadeiro."},
+  {t:"<b>Premissa 1:</b> Se reflorestarmos, então a biodiversidade aumenta.<br><b>Premissa 2:</b> Reflorestamos.<br><b>Conclusão:</b> Logo, a biodiversidade aumenta.", r:"valido", e:"<b>VÁLIDO.</b> É o formato: Se p, então q. p. Logo, q. Se reflorestar de verdade, a biodiversidade tem que aumentar. A forma garante a conclusão."},
+  {t:"<b>Premissa 1:</b> Se reflorestarmos, então as mudas crescem.<br><b>Premissa 2:</b> As mudas cresceram.<br><b>Conclusão:</b> Logo, reflorestamos.", r:"invalido", e:"<b>INVÁLIDO.</b> As mudas podem ter crescido sozinhas, porque choveu muito ou porque alguém regou, sem ninguém ter reflorestado. Ver o resultado não prova a causa."},
+  {t:"<b>Premissa 1:</b> Se reflorestarmos, então as mudas crescem.<br><b>Premissa 2:</b> Não reflorestamos.<br><b>Conclusão:</b> Logo, as mudas não cresceram.", r:"invalido", e:"<b>INVÁLIDO.</b> Mesmo sem reflorestar, as mudas podem crescer por chuva, por sementes que já estavam no solo ou por cuidado de moradores. Não fazer uma coisa não impede o resultado."},
+  {t:"<b>Premissa 1:</b> Se reflorestarmos, então as mudas crescem.<br><b>Premissa 2:</b> As mudas NÃO cresceram.<br><b>Conclusão:</b> Logo, não reflorestamos.", r:"valido", e:"<b>VÁLIDO.</b> É o formato: Se p, então q. Não-q. Logo, não-p. Se tivesse reflorestado, as mudas teriam crescido. Como não cresceram, é porque não reflorestou."},
+  {t:"<b>Premissa 1:</b> Se desmatarmos, então os animais perdem o habitat.<br><b>Premissa 2:</b> Os animais perderam o habitat.<br><b>Conclusão:</b> Logo, desmatamos.", r:"invalido", e:"<b>INVÁLIDO.</b> Os animais podem ter perdido o habitat por incêndio, por seca, por construção de estrada ou por poluição do rio. Perder o habitat não prova que foi desmatamento."},
+  {t:"<b>Premissa 1:</b> Se fragmentarmos a floresta, então o interior diminui.<br><b>Premissa 2:</b> O interior NÃO diminuiu.<br><b>Conclusão:</b> Logo, não fragmentamos.", r:"valido", e:"<b>VÁLIDO.</b> Mesmo formato do anterior: Se p, então q. Não-q. Logo, não-p. Se tivesse fragmentado, o interior teria diminuído."},
+  {t:"<b>Premissa 1:</b> Se o efeito de borda aumentar, então as espécies de interior sofrem.<br><b>Premissa 2:</b> O efeito de borda NÃO aumentou.<br><b>Conclusão:</b> Logo, as espécies de interior não sofrem.", r:"invalido", e:"<b>INVÁLIDO.</b> As espécies de interior podem sofrer por outros motivos: falta de alimento, caça, doença ou seca. Não aumentar a borda não garante que elas estão bem."},
 ];
 function nivel2(){ n2=0; mostrar2(); }
 function mostrar2(){
   if(n2>=perguntas2.length){ tela.innerHTML=`<h2>🎉 Nível 2 completo!</h2><p>${pontos} pontos.</p><button class="next" onclick="menu()">Menu</button>`; return; }
   const p=perguntas2[n2];
-  tela.innerHTML=`<span class="badge">NÍVEL 2 • ${n2+1}/6 • ${pontos} pts</span><p class="pergunta">${p.t}</p>
-  <button class="opt" onclick="resp2('Modus Ponens')">Modus Ponens (Válido)</button>
-  <button class="opt" onclick="resp2('Modus Tollens')">Modus Tollens (Válido)</button>
-  <button class="opt" onclick="resp2('Afirmando o Consequente')">Afirmando o Consequente (Falácia)</button>
-  <button class="opt" onclick="resp2('Negando o Antecedente')">Negando o Antecedente (Falácia)</button>
-  <button class="opt" onclick="resp2('Válido mas NÃO sólido')">Válido mas NÃO sólido</button>
-  <p id="feedback"></p><div id="btn"></div>`;
+  tela.innerHTML=`<span class="badge">NÍVEL 2 • ${n2+1}/7 • ${pontos} pts</span><p class="pergunta">${p.t}</p>
+  <button class="v" onclick="resp2('valido')">✅ VÁLIDO</button>
+  <button class="f" onclick="resp2('invalido')">❌ INVÁLIDO</button>
+  <p id="feedback"></p><div id="btn"></div><p class="perdeu">Erro = -5 pontos</p>`;
 }
 function resp2(resp){
-  const p=perguntas2[n2]; const ok=p.r===resp; if(ok) pontos+=20;
-  document.getElementById('feedback').innerHTML=ok?`<span class="certo">✅ Acertou! +20</span>`:`<span class="errado">❌ Errou! Era: ${p.r}</span>`;
+  const p=perguntas2[n2]; const ok=p.r===resp; if(ok) pontos+=20; else perderPontos();
+  document.getElementById('feedback').innerHTML=ok?`<span class="certo">✅ Acertou! +20</span>`:`<span class="errado">❌ Errou! -5. Era: ${p.r==="valido"?"VÁLIDO":"INVÁLIDO"}</span>`;
   document.getElementById('btn').innerHTML=`<div class="explica">${p.e}</div><button class="next" onclick="n2++;mostrar2()">Próxima →</button>`;
 }
 
-// ===== NÍVEL 3 =====
+// ================= NÍVEL 3 =================
+function intro3(){
+  tela.innerHTML=`
+    <span class="badge">NÍVEL 3</span>
+    <h2>📊 Antes de começar...</h2>
+    <div class="conceito">
+      <b>Você vai usar a tabela-verdade!</b><br><br>
+      • <b>p → q</b> significa: <b>Se p, então q</b>. Só é <b>F</b> quando é <b>V → F</b>. Nos outros 3 casos é V.<br>
+      • <b>p ∧ q</b> significa: <b>p E q</b>. Só é <b>V</b> quando as duas são V.<br>
+      • <b>¬p</b> significa: <b>NÃO p</b>. Inverte: ¬V = F, ¬F = V.<br><br>
+      <b>Exemplo modelo:</b><br>
+      p: Chover<br>
+      q: Comprar um guarda-chuva<br>
+      p → q: Se chover, então comprarei um guarda-chuva<br><br>
+      Se p = V (choveu) e q = F (não comprei), então p → q = <b>F</b>, porque eu prometi e não cumpri.<br><br>
+      Agora vamos fazer isso com <b>reflorestamento, efeito de borda, desmatamento e fragmentação</b>.
+    </div>
+    <p>✅ Acerto: <b>+15</b> &nbsp; | &nbsp; ❌ Erro: <b>-5</b></p>
+    <button class="next" onclick="nivel3()">Entendi, começar! ▶️</button>
+    <button onclick="menu()">Voltar</button>
+  `;
+}
 let n3=0;
 const perguntas3=[
-  {t:"Se p = V e q = F, quanto vale <b>p → q</b> ?", r:"F", e:"p → q só é F quando é V → F."},
-  {t:"Se p = F e q = V, quanto vale <b>p → q</b> ?", r:"V", e:"F → V = V. Por isso Negando o Antecedente é falácia!"},
-  {t:"Se p = V e q = V, quanto vale <b>p ∧ q</b> ?", r:"V", e:"∧ só é V quando as duas são V."},
-  {t:"Se p = V e q = F, quanto vale <b>p ∧ q</b> ?", r:"F", e:"V ∧ F = F."},
-  {t:"Se p = F, quanto vale <b>¬p</b> ?", r:"V", e:"Negação inverte: ¬F = V."},
+  {t:`<b>🌱 Reflorestamento</b><br>
+  p: Reflorestar a área<br>
+  q: As mudas crescerem<br>
+  p → q: Se reflorestar a área, então as mudas crescerão<br><br>
+  Se p = <b>V</b> e q = <b>F</b>, quanto vale <b>p → q</b> ?`, r:"F", e:"<b>F.</b> Você reflorestou (V) mas as mudas não cresceram (F). A promessa Se p, então q falhou. V → F = F."},
+  {t:`<b>🌲 Efeito de borda</b><br>
+  p: Aumentar o efeito de borda<br>
+  q: As espécies de interior sofrerem<br>
+  p → q: Se aumentar o efeito de borda, então as espécies de interior sofrerão<br><br>
+  Se p = <b>F</b> e q = <b>V</b>, quanto vale <b>p → q</b> ?`, r:"V", e:"<b>V.</b> O efeito de borda não aumentou (F), mas as espécies sofreram mesmo assim (V), por outro motivo, como seca. F → V = V. Por isso não dá pra concluir que não sofreu só porque a borda não aumentou."},
+  {t:`<b>🪓 Desmatamento</b><br>
+  p: Desmatar a floresta<br>
+  q: Os animais perderem o habitat<br>
+  p → q: Se desmatar a floresta, então os animais perderão o habitat<br><br>
+  Se p = <b>V</b> e q = <b>V</b>, quanto vale <b>p → q</b> ?`, r:"V", e:"<b>V.</b> Desmatou (V) e os animais perderam o habitat (V). A promessa se cumpriu. V → V = V."},
+  {t:`<b>🧩 Fragmentação</b><br>
+  p: Fragmentar a floresta<br>
+  q: O interior da floresta diminuir<br>
+  p → q: Se fragmentar a floresta, então o interior diminuirá<br><br>
+  Se p = <b>F</b> e q = <b>F</b>, quanto vale <b>p → q</b> ?`, r:"V", e:"<b>V.</b> Não fragmentou (F) e o interior não diminuiu (F). A promessa não foi quebrada. F → F = V."},
+  {t:`<b>🌱 Reflorestamento + Efeito de borda</b><br>
+  p: Plantar espécies pioneiras<br>
+  q: O solo ficar protegido do sol<br>
+  p ∧ q: Plantar espécies pioneiras E o solo ficar protegido<br><br>
+  Se p = <b>V</b> e q = <b>V</b>, quanto vale <b>p ∧ q</b> ?`, r:"V", e:"<b>V.</b> Plantou (V) E o solo ficou protegido (V). Para o E (∧) ser V, as duas precisam ser V. V ∧ V = V."},
+  {t:`<b>🪓 Desmatamento + Fragmentação</b><br>
+  p: Desmatar a floresta<br>
+  q: Fragmentar a floresta<br>
+  p ∧ q: Desmatar E fragmentar<br><br>
+  Se p = <b>V</b> e q = <b>F</b>, quanto vale <b>p ∧ q</b> ?`, r:"F", e:"<b>F.</b> Desmatou (V) mas NÃO fragmentou (F). O E (∧) exige as duas verdadeiras. V ∧ F = F."},
+  {t:`<b>🌲 Efeito de borda</b><br>
+  p: O efeito de borda aumentar<br>
+  ¬p: O efeito de borda NÃO aumentar<br><br>
+  Se p = <b>F</b>, quanto vale <b>¬p</b> ?`, r:"V", e:"<b>V.</b> Negação inverte. Se é falso que aumentou, é verdadeiro que NÃO aumentou. ¬F = V."},
+  {t:`<b>🧩 Fragmentação</b><br>
+  p: A fragmentação prejudicar os ecossistemas<br>
+  ¬p: A fragmentação NÃO prejudicar os ecossistemas<br><br>
+  Se p = <b>V</b>, quanto vale <b>¬p</b> ?`, r:"F", e:"<b>F.</b> Se é verdadeiro que prejudica, é falso dizer que NÃO prejudica. ¬V = F."},
 ];
 function nivel3(){ n3=0; mostrar3(); }
 function mostrar3(){
   if(n3>=perguntas3.length){ tela.innerHTML=`<h2>🎉 Nível 3 completo!</h2><p>${pontos} pontos.</p><button class="next" onclick="menu()">Menu</button>`; return; }
   const p=perguntas3[n3];
-  tela.innerHTML=`<span class="badge">NÍVEL 3 • TABELA-VERDADE • ${n3+1}/5</span><p class="pergunta">${p.t}</p>
+  tela.innerHTML=`<span class="badge">NÍVEL 3 • TABELA-VERDADE • ${n3+1}/8 • ${pontos} pts</span><p class="pergunta">${p.t}</p>
   <table><tr><th>p</th><th>q</th><th>p → q</th><th>p ∧ q</th></tr><tr><td>V</td><td>V</td><td>V</td><td>V</td></tr><tr><td>V</td><td>F</td><td>F</td><td>F</td></tr><tr><td>F</td><td>V</td><td>V</td><td>F</td></tr><tr><td>F</td><td>F</td><td>V</td><td>F</td></tr></table>
-  <button class="v" onclick="resp3('V')">V</button><button class="f" onclick="resp3('F')">F</button><p id="feedback"></p><div id="btn"></div>`;
+  <button class="v" onclick="resp3('V')">V</button><button class="f" onclick="resp3('F')">F</button><p id="feedback"></p><div id="btn"></div><p class="perdeu">Erro = -5 pontos</p>`;
 }
 function resp3(resp){
-  const p=perguntas3[n3]; const ok=p.r===resp; if(ok) pontos+=15;
-  document.getElementById('feedback').innerHTML=ok?`<span class="certo">✅ Acertou! +15</span>`:`<span class="errado">❌ Errou! Era: ${p.r}</span>`;
+  const p=perguntas3[n3]; const ok=p.r===resp; if(ok) pontos+=15; else perderPontos();
+  document.getElementById('feedback').innerHTML=ok?`<span class="certo">✅ Acertou! +15</span>`:`<span class="errado">❌ Errou! -5. Era: ${p.r}</span>`;
   document.getElementById('btn').innerHTML=`<div class="explica">${p.e}</div><button class="next" onclick="n3++;mostrar3()">Próxima →</button>`;
 }
 
-// ===== NÍVEL 4 =====
+// ================= NÍVEL 4 =================
+function intro4(){
+  tela.innerHTML=`
+    <span class="badge">NÍVEL 4</span>
+    <h2>🌲 Antes de começar...</h2>
+    <div class="conceito">
+      <b>Fragmentação:</b> dividir a floresta em pedaços menores.<br><br>
+      <b>Efeito de borda:</b> a parte da floresta perto da borda sofre mais sol, vento, seca e invasão. A parte de dentro, o <b>interior</b>, é mais úmida e protegida.<br><br>
+      <b>Regra de ouro:</b> Quanto mais fragmentada, <b>maior a borda e menor o interior</b>.<br><br>
+      <b>Exemplo do slide:</b><br>
+      • Região A (1 fragmento grande): interior = <b>4.800 m²</b>, borda = 36%<br>
+      • Região B (5 fragmentos pequenos, mesma área total): interior = <b>2.306 m²</b>, borda = 69%<br><br>
+      <b>Espécie de interior:</b> precisa de sombra e umidade, sofre muito.<br>
+      <b>Espécie de borda:</b> gosta de sol, até se beneficia.<br><br>
+      <b>Fórmula:</b> Área interior = 3 × (raio interior)², com π ≈ 3 e borda de 10m.
+    </div>
+    <p>✅ Acerto: <b>+25</b> &nbsp; | &nbsp; ❌ Erro: <b>-5</b></p>
+    <button class="next" onclick="nivel4()">Entendi, começar! ▶️</button>
+    <button onclick="menu()">Voltar</button>
+  `;
+}
 let n4=0;
 const perguntas4=[
   {t:"Região A tem 1 fragmento grande. Região B tem 5 fragmentos pequenos, mesma área total. Qual tem <b>mais interior de floresta</b>?", r:"Região A", e:"A: 4.800 m² de interior. B: só 2.306 m²."},
@@ -195,11 +307,11 @@ function mostrar4(){
   else if(p.r==="4800") botoes=`<input type="number" id="respInput" placeholder="???"> <button class="next" onclick="resp4(document.getElementById('respInput').value)">Responder</button>`;
   else if(p.r==="Região A") botoes=`<button class="opt" onclick="resp4('Região A')">Região A</button><button class="opt" onclick="resp4('Região B')">Região B</button>`;
   else botoes=`<button class="opt" onclick="resp4('Interior')">Espécie de interior</button><button class="opt" onclick="resp4('Borda')">Espécie de borda</button>`;
-  tela.innerHTML=`<span class="badge">NÍVEL 4 • FRAGMENTAÇÃO • ${n4+1}/5 • ${pontos} pts</span><p class="pergunta">${p.t}</p>${botoes}<p id="feedback"></p><div id="btn"></div>`;
+  tela.innerHTML=`<span class="badge">NÍVEL 4 • FRAGMENTAÇÃO • ${n4+1}/5 • ${pontos} pts</span><p class="pergunta">${p.t}</p>${botoes}<p id="feedback"></p><div id="btn"></div><p class="perdeu">Erro = -5 pontos</p>`;
 }
 function resp4(resp){
-  const p=perguntas4[n4]; const ok=String(p.r)===String(resp); if(ok) pontos+=25;
-  document.getElementById('feedback').innerHTML=ok?`<span class="certo">✅ Acertou! +25</span>`:`<span class="errado">❌ Errou! Era: ${p.r}</span>`;
+  const p=perguntas4[n4]; const ok=String(p.r)===String(resp); if(ok) pontos+=25; else perderPontos();
+  document.getElementById('feedback').innerHTML=ok?`<span class="certo">✅ Acertou! +25</span>`:`<span class="errado">❌ Errou! -5. Era: ${p.r}</span>`;
   document.getElementById('btn').innerHTML=`<div class="explica">${p.e}</div><button class="next" onclick="n4++;mostrar4()">Próxima →</button>`;
 }
 
