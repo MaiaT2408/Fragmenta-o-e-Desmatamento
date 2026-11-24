@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogo de Lógica - Guardiões Verdes</title>
+<style>
+  body{font-family:Arial;text-align:center;background:#e8f5e9;padding:20px}
+  .card{background:white;padding:25px;border-radius:15px;max-width:500px;margin:auto;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+  button{font-size:18px;padding:12px 20px;margin:10px;border:none;border-radius:10px;cursor:pointer}
+  .v{background:#4caf50;color:white}
+  .f{background:#f44336;color:white}
+  #feedback{font-weight:bold;margin-top:15px}
+</style>
+</head>
+<body>
+  <h1>🌳 Guardiões Verdes</h1>
+  <p>Classifique em Verdadeiro ou Falso</p>
+  <div class="card">
+    <h2 id="pergunta"></h2>
+    <p>Placar: <span id="placar">0</span> | Pergunta <span id="num">1</span>/5</p>
+    <button class="v" onclick="responder(true)">Verdadeiro</button>
+    <button class="f" onclick="responder(false)">Falso</button>
+    <p id="feedback"></p>
+    <button id="proxima" onclick="proxima()" style="display:none;background:#2196f3;color:white">Próxima →</button>
+  </div>
+<script>
+const perguntas=[
+  {t:"As árvores fazem fotossíntese.", r:true, e:"Sim! E absorvem gás carbônico."},
+  {t:"O desmatamento ajuda a preservar os animais.", r:false, e:"Não! Destrói o habitat deles."},
+  {t:"Reflorestar é plantar novas árvores onde a floresta foi destruída.", r:true, e:"Isso mesmo!"},
+  {t:"Se reflorestarmos, então a biodiversidade aumenta.", r:true, e:"Modus Ponens na prática!"},
+  {t:"Queimar a floresta limpa o ar.", r:false, e:"Pelo contrário, polui o ar."},
+];
+let i=0, pontos=0;
+function mostrar(){
+  document.getElementById('pergunta').innerText=perguntas[i].t;
+  document.getElementById('num').innerText=i+1;
+  document.getElementById('feedback').innerText="";
+  document.getElementById('proxima').style.display="none";
+}
+function responder(resp){
+  const certa = perguntas[i].r === resp;
+  if(certa) pontos++;
+  document.getElementById('placar').innerText=pontos;
+  document.getElementById('feedback').innerText=(certa?"✅ Acertou! ":"❌ Errou! ")+perguntas[i].e;
+  document.getElementById('proxima').style.display="inline-block";
+}
+function proxima(){
+  i++;
+  if(i>=perguntas.length){
+    document.querySelector('.card').innerHTML=`<h2>Fim de jogo! 🎉</h2><p>Você fez ${pontos} de ${perguntas.length}</p><button onclick="location.reload()">Jogar de novo</button>`;
+  } else mostrar();
+}
+mostrar();
+</script>
+</body>
+</html>
